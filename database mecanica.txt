@@ -1,0 +1,140 @@
+create database mecanica
+
+use mecanica
+
+create table cliente (
+cpf bigint(11) primary key unique,
+nome varchar(45) not null,
+telefone bigint(8) not null,
+email varchar(45) not null,
+data_cadastro date not null,
+endereco text not null,
+historico_atendimento varchar(45) not null )
+
+create table agendamento (
+id_agendamento int primary key auto_increment,
+data_agendamento date not null,
+tempo_servico time not null,
+data_entrega date not null,
+forma_pagamento varchar(20),
+observacoes text,
+cpf bigint(11),
+foreign key (cpf) references cliente(cpf),
+placa varchar(7),
+foreign key (placa) references veiculo(placa) )
+
+create table veiculo (
+placa varchar(7) primary key not null,
+modelo varchar(30),
+quilometragem int,
+marca varchar(30),
+tipo_manutencao varchar(45) not null,
+peca_utilizada varchar(45),
+cpf bigint(11),
+foreign key (cpf) references cliente(cpf) )
+
+create table estoque (
+id_estoque int primary key auto_increment,
+endereco text not null,
+data_entrada date not null,
+data_saida date not null,
+preco_custo float not null,
+preco_venda float not null,
+quantidade int not null)
+
+create table mecanico(
+cpf bigint(11) primary key not null,
+nome varchar(45) not null,
+especialidade varchar(50) not null,
+telefone bigint(8) not null,
+carga_horaria varchar(45) not null,
+email varchar(45) not null,
+data_admissao date not null )
+
+create table servico (
+id_servico int primary key auto_increment,
+data_servico date not null,
+valor_total float not null,
+status_servico varchar(45) not null,
+tipo_servico varchar(45) not null,
+cpf bigint(11),
+foreign key (cpf) references mecanico(cpf),
+placa varchar(7),
+foreign key (placa) references veiculo(placa) )
+
+create table peca (
+id_peca int primary key auto_increment,
+marca varchar(45) not null,
+nome varchar(45) not null,
+preco_unitario float not null,
+garantia date not null,
+tipo varchar(45) not null,
+id_estoque int,
+foreign key (id_estoque) references estoque(id_estoque) )
+
+create table servico_peca (
+id_servico_peca int primary key auto_increment,
+id_peca int,
+foreign key (id_peca) references peca(id_peca),
+id_servico int, 
+foreign key (id_servico) references servico(id_servico) )
+
+INSERT INTO cliente (cpf, nome, telefone, email, data_cadastro, endereco, historico_atendimento) VALUES
+(12345678901, 'João Silva', 98765432, 'joao.silva@email.com', '2025-05-20', 'Rua A, 123, São Paulo, SP', 'Troca de óleo e revisão de freios'),
+(23456789012, 'Maria Oliveira', 98765433, 'maria.oliveira@email.com', '2025-05-18', 'Rua B, 456, Campinas, SP', 'Alinhamento e balanceamento'),
+(34567890123, 'Carlos Pereira', 98765434, 'carlos.pereira@email.com', '2025-05-17', 'Rua C, 789, Rio de Janeiro, RJ', 'Troca de pneus e revisão do motor'),
+(45678901234, 'Fernanda Costa', 98765435, 'fernanda.costa@email.com', '2025-05-15', 'Rua D, 1011, Belo Horizonte, MG', 'Manutenção de suspensão e troca de pastilhas de freio'),
+(56789012345, 'Pedro Souza', 98765436, 'pedro.souza@email.com', '2025-05-12', 'Rua E, 1213, Curitiba, PR', 'Troca de bateria e revisão elétrica');
+
+INSERT INTO veiculo (placa, modelo, quilometragem, marca, tipo_manutencao, peca_utilizada, cpf) VALUES
+('ABC1234', 'Fusca', 85000, 'Volkswagen', 'Troca de óleo e revisão', 'Óleo 20W50', 12345678901),
+('XYZ5678', 'Civic', 50000, 'Honda', 'Alinhamento e balanceamento', 'Balanceamento de rodas', 23456789012),
+('LMN3456', 'Onix', 40000, 'Chevrolet', 'Troca de pneus', 'Pneus Pirelli 195/55 R15', 34567890123),
+('QRS7890', 'Palio', 120000, 'Fiat', 'Manutenção de suspensão', 'Amortecedores', 45678901234),
+('DEF4321', 'Corolla', 70000, 'Toyota', 'Revisão elétrica', 'Bateria Moura 60Ah', 56789012345);
+
+INSERT INTO agendamento (data_agendamento, tempo_servico, data_entrega, forma_pagamento, observacoes, cpf, placa) VALUES
+('2025-05-20', '02:30:00', '2025-05-21', 'Cartão de Crédito', 'Troca de óleo e revisão de freios', 12345678901, 'ABC1234'),
+('2025-05-18', '01:15:00', '2025-05-19', 'Dinheiro', 'Alinhamento e balanceamento', 23456789012, 'XYZ5678'),
+('2025-05-17', '03:00:00', '2025-05-18', 'Débito', 'Troca de pneus e revisão do motor', 34567890123, 'LMN3456'),
+('2025-05-15', '02:00:00', '2025-05-16', 'Cartão de Crédito', 'Manutenção de suspensão e troca de pastilhas de freio', 45678901234, 'QRS7890'),
+('2025-05-12', '01:45:00', '2025-05-13', 'Pix', 'Troca de bateria e revisão elétrica', 56789012345, 'DEF4321');
+
+INSERT INTO estoque (endereco, data_entrada, data_saida, preco_custo, preco_venda, quantidade) VALUES
+('Avenida Paulista, 1000, São Paulo, SP', '2025-05-10', '2025-05-12', 50.00, 80.00, 100),
+('Rua das Flores, 500, Campinas, SP', '2025-05-11', '2025-05-13', 35.00, 60.00, 150),
+('Rua A, 123, Belo Horizonte, MG', '2025-05-12', '2025-05-14', 70.00, 110.00, 80),
+('Rua B, 456, Curitiba, PR', '2025-05-13', '2025-05-15', 20.00, 40.00, 200),
+('Avenida Brasil, 2000, Rio de Janeiro, RJ', '2025-05-14', '2025-05-16', 45.00, 75.00, 120);
+
+INSERT INTO mecanico (cpf, nome, especialidade, telefone, carga_horaria, email, data_admissao) VALUES
+(12345678901, 'Carlos Souza', 'Motor', 98765431, '40h semanais', 'carlos.souza@email.com', '2023-05-01'),
+(23456789012, 'Fernanda Silva', 'Suspensão', 98765432, '40h semanais', 'fernanda.silva@email.com', '2022-03-15'),
+(34567890123, 'João Oliveira', 'Freios', 98765433, '40h semanais', 'joao.oliveira@email.com', '2024-01-10'),
+(45678901234, 'Patrícia Costa', 'Elétrica', 98765434, '40h semanais', 'patricia.costa@email.com', '2021-07-23'),
+(56789012345, 'Ricardo Pereira', 'Alinhamento e Balanceamento', 98765435, '40h semanais', 'ricardo.pereira@email.com', '2020-11-05');
+
+INSERT INTO servico (data_servico, valor_total, status_servico, tipo_servico, cpf, placa) VALUES
+('2025-05-20', 150.00, 'Concluído', 'Troca de óleo', 12345678901, 'ABC1234'),
+('2025-05-18', 200.00, 'Em andamento', 'Alinhamento e balanceamento', 23456789012, 'XYZ5678'),
+('2025-05-17', 1200.00, 'Concluído', 'Troca de pneus e revisão do motor', 34567890123, 'LMN3456'),
+('2025-05-15', 350.00, 'Concluído', 'Manutenção de suspensão', 45678901234, 'QRS7890'),
+('2025-05-12', 500.00, 'Em andamento', 'Revisão elétrica e troca de bateria', 56789012345, 'DEF4321');
+
+INSERT INTO peca (marca, nome, preco_unitario, garantia, tipo, id_estoque) VALUES
+('Bosch', 'Filtro de óleo', 35.00, '2026-05-20', 'Peça de motor', 1),
+('Pirelli', 'Pneu 195/55 R15', 250.00, '2026-07-15', 'Pneu', 2),
+('Moura', 'Bateria 60Ah', 180.00, '2026-06-10', 'Elétrica', 3),
+('Monroe', 'Amortecedor dianteiro', 120.00, '2026-08-01', 'Suspensão', 4),
+('Valeo', 'Pastilha de freio', 85.00, '2026-09-10', 'Freios', 5);
+
+select
+	  cliente.cpf
+from
+      veiculo
+join
+	  cliente on veiculo.cpf = cliente.cpf
+      
+show tables
+
+select * from peca
